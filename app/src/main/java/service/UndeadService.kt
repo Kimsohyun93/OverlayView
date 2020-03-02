@@ -6,12 +6,15 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import io.torder.overlayview.MainActivity
@@ -22,6 +25,7 @@ import java.util.*
 
 class UndeadService : Service() {
 
+    lateinit var mView: View
     // 드래그앤드롭으로 위젯이동 구현
     var mTouchX: Float = 0f
     var mTouchY: Float = 0f
@@ -33,11 +37,30 @@ class UndeadService : Service() {
         var serviceIntent: Intent? = null
     }
 
+    // Binder given to clients
+    private val binder = UndeadBinder()
+
+    // Random number generator
+    private val mGenerator = Random()
+
+    /** method for clients  */
+    val randomNumber: Int
+        get() = mGenerator.nextInt(100)
+
+    inner class UndeadBinder : Binder() {
+        // Return this instance of LocalService so clients can call public methods
+        fun getService(): UndeadService = this@UndeadService
+    }
+
+    override fun onBind(intent: Intent): IBinder {
+        return binder
+    }
+
     override fun onCreate() {
         super.onCreate()
         // 오버레이 뷰(아이콘) 생성
         var mInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var mView = mInflater.inflate(R.layout.view_overlay, null)
+        mView = mInflater.inflate(R.layout.view_overlay, null)
 
         var layoutFlag: Int = 0
 
@@ -70,7 +93,7 @@ class UndeadService : Service() {
                 intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent!!.addCategory(Intent.CATEGORY_LAUNCHER)
                 startActivity(intent)
-            } catch (e:Exception) {
+            } catch (e: Exception) {
                 Log.e("mView.onclick", e.toString())
             }
         }
@@ -106,10 +129,6 @@ class UndeadService : Service() {
         serviceIntent = intent
         initializeNotification()
         return START_STICKY
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
     }
 
     // 노티피케이션 이니셜라이즈
@@ -178,5 +197,21 @@ class UndeadService : Service() {
 
         var alramManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alramManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, sender)
+    }
+
+    fun showIconView() {
+        try {
+            mView.visibility = VISIBLE
+        } catch (e: Exception) {
+
+        }
+    }
+
+    fun hideIconView() {
+        try {
+            mView.visibility = GONE
+        } catch (e: Exception) {
+
+        }
     }
 }

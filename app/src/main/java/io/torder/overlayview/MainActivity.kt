@@ -1,9 +1,13 @@
 package io.torder.overlayview
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -20,10 +24,27 @@ import service.UndeadService
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var mService: UndeadService
+    private var mBound: Boolean = false
     var foregroundServiceIntent: Intent? = null
+
     lateinit var settings: WebSettings
     lateinit var webClient: WebChromeClient
     val webUrl = "http://api.inventory.torder.co.kr/callOtherAppTest.html"
+
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as UndeadService.UndeadBinder
+            mService = binder.getService()
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,17 +58,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setWebview() {
         settings = wv.settings
-        settings.setJavaScriptEnabled(true)
-        settings.setDomStorageEnabled(true) // 로컬 스토리지 등 브라우저 저장소 활성화
-
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT) // 캐시 활성화
-
+        settings.javaScriptEnabled = true
+        settings.domStorageEnabled = true // 로컬 스토리지 등 브라우저 저장소 활성화
+        settings.cacheMode = WebSettings.LOAD_DEFAULT // 캐시 활성화
         settings.setAppCacheEnabled(true)
-        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN)
+        settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
 
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null) // 하드웨어 가속 활성
         wv.setWebChromeClient(WebChromeClient())
-
         wv.addJavascriptInterface(WebBridge(this), "Android")
         Log.e("setWebViewSettings", webUrl)
         wv.loadUrl(webUrl)
@@ -71,6 +89,24 @@ class MainActivity : AppCompatActivity() {
         } else {
             // 안드로이드 M미만에서는 매니페스트에 퍼미션만 넣으면 되므로 별도 처리 필요하지 않음
             startUndeadService()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Intent(this, UndeadService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+        if (mBound) {
+            mService.hideIconView()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show()
+        if (mBound) {
+            mService.showIconView()
         }
     }
 
