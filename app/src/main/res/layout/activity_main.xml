@@ -16,4 +16,9 @@
         android:layout_height="wrap_content"
         android:onClick="mStop"
         android:text="종료하기" />
+
+    <WebView
+        android:id="@+id/wv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </LinearLayout>

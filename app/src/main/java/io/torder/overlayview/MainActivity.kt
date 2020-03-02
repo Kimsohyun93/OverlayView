@@ -5,9 +5,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 import service.UndeadService
 
 // 안드로이드 8.1 부터 background service 제약사항이 생기고
@@ -17,11 +21,38 @@ import service.UndeadService
 class MainActivity : AppCompatActivity() {
 
     var foregroundServiceIntent: Intent? = null
+    lateinit var settings: WebSettings
+    lateinit var webClient: WebChromeClient
+    val webUrl = "http://api.inventory.torder.co.kr/callOtherAppTest.html"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setWebview()
     }
+
+    public fun testCallOtherApp() {
+        Toast.makeText(this, "id", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setWebview() {
+        settings = wv.settings
+        settings.setJavaScriptEnabled(true)
+        settings.setDomStorageEnabled(true) // 로컬 스토리지 등 브라우저 저장소 활성화
+
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT) // 캐시 활성화
+
+        settings.setAppCacheEnabled(true)
+        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN)
+
+        wv.setLayerType(View.LAYER_TYPE_HARDWARE, null) // 하드웨어 가속 활성
+        wv.setWebChromeClient(WebChromeClient())
+
+        wv.addJavascriptInterface(WebBridge(this), "Android")
+        Log.e("setWebViewSettings", webUrl)
+        wv.loadUrl(webUrl)
+    }
+
 
     fun mStart(view: View) { // 시작하기를 누르면
 
