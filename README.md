@@ -1,7 +1,8 @@
 # Overlay view
 
-**kotlin**
+**Overview**
 
++ powerd by kotlin 
 + 최상위에 항상 떠있는 뷰(아이콘)를 생성
 + 드래그앤드롭으로 이동가능
 + 클릭시 액션(현재는 티오더-오더해앱을 띄우도록 동작중)
@@ -13,7 +14,7 @@
 
 **Version Control**
 
-1. 오버레이관련
+1. 오버레이 호출
 
 + Under M - 제약 없음. 매니페스트 퍼미션만 확인
 
@@ -40,7 +41,21 @@
 
 
 
-2. 서비스 구동
+2. 오버레이 형식
+
+   ```kotlin
+   // 8.1 이상에서는 TYPE APPLICATION OVERLAY 로 사용하고
+   // 그 이전 버전에서는 TYPE_PHONE 을 사용함
+   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+       layoutFlag = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+   } else {
+       layoutFlag = WindowManager.LayoutParams.TYPE_PHONE;
+   }
+   ```
+
+
+
+3. 서비스 구동
 
 + Under O - startService로 제어
 
@@ -58,7 +73,7 @@
 
 
 
-3. 노티피케이션 채널
+4. 노티피케이션 채널
 
 + Under O - 채널설정없음
 
@@ -99,3 +114,12 @@
 + Broadcast Receiver
 + UndeadService 가 종료되는 경우 AlarmReceiver를 불러서 3초후 가동하도록 함
 + AlarmReceiver는 3초후 UndeadService를 다시 구동시켜서 죽지 않도록 함 
+
+
+
+**Version note**
+
++ 1.0
+  + First commit
++ 1.1
+  + Implements bindService - control inner service
