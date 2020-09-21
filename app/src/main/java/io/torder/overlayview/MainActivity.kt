@@ -49,27 +49,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setWebview()
+        //setWebview()
     }
 
     public fun testCallOtherApp() {
         Toast.makeText(this, "id", Toast.LENGTH_SHORT).show()
     }
 
-    private fun setWebview() {
-        settings = wv.settings
-        settings.javaScriptEnabled = true
-        settings.domStorageEnabled = true // 로컬 스토리지 등 브라우저 저장소 활성화
-        settings.cacheMode = WebSettings.LOAD_DEFAULT // 캐시 활성화
-        settings.setAppCacheEnabled(true)
-        settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
-
-        wv.setLayerType(View.LAYER_TYPE_HARDWARE, null) // 하드웨어 가속 활성
-        wv.setWebChromeClient(WebChromeClient())
-        wv.addJavascriptInterface(WebBridge(this), "Android")
-        Log.e("setWebViewSettings", webUrl)
-        wv.loadUrl(webUrl)
-    }
+//    private fun setWebview() {
+//        settings = wv.settings
+//        settings.javaScriptEnabled = true
+//        settings.domStorageEnabled = true // 로컬 스토리지 등 브라우저 저장소 활성화
+//        settings.cacheMode = WebSettings.LOAD_DEFAULT // 캐시 활성화
+//        settings.setAppCacheEnabled(true)
+//        settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
+//
+//        wv.setLayerType(View.LAYER_TYPE_HARDWARE, null) // 하드웨어 가속 활성
+//        wv.setWebChromeClient(WebChromeClient())
+//        wv.addJavascriptInterface(WebBridge(this), "Android")
+//        Log.e("setWebViewSettings", webUrl)
+//        wv.loadUrl(webUrl)
+//    }
 
 
     fun mStart(view: View) { // 시작하기를 누르면

@@ -75,8 +75,8 @@ class UndeadService : Service() {
 
         // 크기, 범위, 배경등 지정
         var mParams = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
 
             layoutFlag,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
