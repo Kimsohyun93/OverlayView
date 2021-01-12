@@ -85,12 +85,7 @@ class UndeadService : Service() {
                 expendable = true
             }
         }
-//        mView.closeBtn.setOnClickListener {
-//            if (mView != null){
-//                WindowManager.removeView(mView)
-//                mView = null
-//            }
-//        }
+
 
         // 크기, 범위, 배경등 지정
         var mParams = WindowManager.LayoutParams(
