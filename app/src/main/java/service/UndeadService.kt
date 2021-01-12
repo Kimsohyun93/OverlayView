@@ -4,6 +4,7 @@ import AlarmReceiver
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Binder
@@ -19,6 +20,8 @@ import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import io.torder.overlayview.MainActivity
 import io.torder.overlayview.R
+import io.torder.overlayview.SecActivity
+import kotlinx.android.synthetic.main.view_overlay.view.*
 import java.lang.Exception
 import java.util.*
 
@@ -72,11 +75,27 @@ class UndeadService : Service() {
             layoutFlag = WindowManager.LayoutParams.TYPE_PHONE;
         }
 
+        var expendable = true //펼쳐진 상태
+        mView.overlayHeader.setOnClickListener {
+            if(expendable){
+                mView.overlayContents.visibility = GONE
+                expendable = false
+            }else{
+                mView.overlayContents.visibility = VISIBLE
+                expendable = true
+            }
+        }
+//        mView.closeBtn.setOnClickListener {
+//            if (mView != null){
+//                WindowManager.removeView(mView)
+//                mView = null
+//            }
+//        }
 
         // 크기, 범위, 배경등 지정
         var mParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
 
             layoutFlag,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -87,41 +106,60 @@ class UndeadService : Service() {
         var mManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         mManager.addView(mView, mParams)
 
-        mView.setOnClickListener {
-            try {
-                var intent = packageManager.getLaunchIntentForPackage("com.torder.orderhae")
-                intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent!!.addCategory(Intent.CATEGORY_LAUNCHER)
-                startActivity(intent)
-            } catch (e: Exception) {
-                Log.e("mView.onclick", e.toString())
-            }
+        mView.transView.setOnClickListener {
+            var intent = Intent(this, SecActivity::class.java)
+            intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent!!.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+            intent!!.addCategory(Intent.CATEGORY_LAUNCHER)
+            startActivity(intent)
+            mView.overlayContents.visibility = GONE
+
         }
 
-        // 뷰 이동
-        mView.setOnTouchListener(object : View.OnTouchListener {
-            @SuppressLint("NewApi")
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                when (event?.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        mTouchX = event.rawX
-                        mTouchY = event.rawY
-                        mViewX = mParams.x
-                        mViewY = mParams.y
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        var x = (event.rawX - mTouchX).toInt()
-                        var y = (event.rawY - mTouchY).toInt()
+        mView.closeBtn.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("타이틀")
+            builder.setPositiveButton("확인"){ dialogInterface: DialogInterface, i: Int ->
 
-                        mParams.x = mViewX + x;
-                        mParams.y = mViewY + y;
-
-                        mManager.updateViewLayout(mView, mParams)
-                    }
-                }
-                return v?.onTouchEvent(event) ?: true
             }
-        })
+
+        }
+//
+//        mView.setOnClickListener {
+//            try {
+//                var intent = packageManager.getLaunchIntentForPackage("com.torder.orderhae")
+//                intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                intent!!.addCategory(Intent.CATEGORY_LAUNCHER)
+//                startActivity(intent)
+//            } catch (e: Exception) {
+//                Log.e("mView.onclick", e.toString())
+//            }
+//        }
+
+        // 뷰 이동
+//        mView.setOnTouchListener(object : View.OnTouchListener {
+//            @SuppressLint("NewApi")
+//            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+//                when (event?.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        mTouchX = event.rawX
+//                        mTouchY = event.rawY
+//                        mViewX = mParams.x
+//                        mViewY = mParams.y
+//                    }
+//                    MotionEvent.ACTION_MOVE -> {
+//                        var x = (event.rawX - mTouchX).toInt()
+//                        var y = (event.rawY - mTouchY).toInt()
+//
+//                        mParams.x = mViewX + x;
+//                        mParams.y = mViewY + y;
+//
+//                        mManager.updateViewLayout(mView, mParams)
+//                    }
+//                }
+//                return v?.onTouchEvent(event) ?: true
+//            }
+//        })
     }
 
     // 포그라운드 서비스 시작시 노티피케이션 생성 및 제어
@@ -213,5 +251,11 @@ class UndeadService : Service() {
         } catch (e: Exception) {
 
         }
+    }
+
+    fun startMainActivity() {
+        var intent = Intent(this, MainActivity::class.java)
+        intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 }

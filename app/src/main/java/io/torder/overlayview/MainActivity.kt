@@ -107,7 +107,9 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show()
         if (mBound) {
             mService.showIconView()
+            mService.startMainActivity()
         }
+
     }
 
     // 죽지않는 서비스 실행
