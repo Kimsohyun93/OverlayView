@@ -10,19 +10,14 @@ import android.graphics.PixelFormat
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import io.torder.overlayview.MainActivity
 import io.torder.overlayview.R
 import io.torder.overlayview.SecActivity
 import kotlinx.android.synthetic.main.view_overlay.view.*
-import java.lang.Exception
 import java.util.*
 
 
@@ -34,6 +29,8 @@ class UndeadService : Service() {
     var mTouchY: Float = 0f
     var mViewX: Int = 0
     var mViewY: Int = 0
+
+    var expendable = true //펼쳐진 상태
 
     companion object {
         // 스태틱 변수
@@ -75,27 +72,19 @@ class UndeadService : Service() {
             layoutFlag = WindowManager.LayoutParams.TYPE_PHONE;
         }
 
-        var expendable = true //펼쳐진 상태
-        mView.overlayHeader.setOnClickListener {
-            if(expendable){
-                mView.overlayContents.visibility = GONE
-                expendable = false
-            }else{
-                mView.overlayContents.visibility = VISIBLE
-                expendable = true
-            }
-        }
-
 
         // 크기, 범위, 배경등 지정
         var mParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-
             layoutFlag,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         )
+        mParams.gravity = Gravity.LEFT or Gravity.TOP
+        mParams.x = 0
+        mParams.y=0
+
 
         // 윈도우 매니저(최상위 화면)에 오버레이뷰를 추가함
         var mManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -111,7 +100,16 @@ class UndeadService : Service() {
 
         }
 
-        mView.closeBtn.setOnClickListener {
+        mView.foldBtn.setOnClickListener {
+            if(expendable){
+                mView.overlayContents.visibility = GONE
+                expendable = false
+            }else{
+                mView.overlayContents.visibility = VISIBLE
+                expendable = true
+            }
+
+            //alert dialog -> 최상단 뷰라 alert 안됨
             val builder = AlertDialog.Builder(this)
             builder.setTitle("타이틀")
             builder.setPositiveButton("확인"){ dialogInterface: DialogInterface, i: Int ->
@@ -132,29 +130,29 @@ class UndeadService : Service() {
 //        }
 
         // 뷰 이동
-//        mView.setOnTouchListener(object : View.OnTouchListener {
-//            @SuppressLint("NewApi")
-//            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//                when (event?.action) {
-//                    MotionEvent.ACTION_DOWN -> {
-//                        mTouchX = event.rawX
-//                        mTouchY = event.rawY
-//                        mViewX = mParams.x
-//                        mViewY = mParams.y
-//                    }
-//                    MotionEvent.ACTION_MOVE -> {
-//                        var x = (event.rawX - mTouchX).toInt()
-//                        var y = (event.rawY - mTouchY).toInt()
-//
-//                        mParams.x = mViewX + x;
-//                        mParams.y = mViewY + y;
-//
-//                        mManager.updateViewLayout(mView, mParams)
-//                    }
-//                }
-//                return v?.onTouchEvent(event) ?: true
-//            }
-//        })
+        mView.overlayHeader.setOnTouchListener(object : View.OnTouchListener {
+            @SuppressLint("NewApi")
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        mTouchX = event.rawX
+                        mTouchY = event.rawY
+                        mViewX = mParams.x
+                        mViewY = mParams.y
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        var x = (event.rawX - mTouchX).toInt()
+                        var y = (event.rawY - mTouchY).toInt()
+
+                        mParams.x = mViewX + x;
+                        mParams.y = mViewY + y;
+
+                        mManager.updateViewLayout(mView, mParams)
+                    }
+                }
+                return v?.onTouchEvent(event) ?: true
+            }
+        })
     }
 
     // 포그라운드 서비스 시작시 노티피케이션 생성 및 제어
@@ -252,5 +250,8 @@ class UndeadService : Service() {
         var intent = Intent(this, MainActivity::class.java)
         intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+
+        mView.overlayContents.visibility = VISIBLE
+        expendable = true
     }
 }

@@ -16,9 +16,11 @@
         android:layout_height="wrap_content"
         android:onClick="mStop"
         android:text="종료하기" />
-
-    <WebView
-        android:id="@+id/wv"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:text="Overlay View Test\nOverlay View Test\nOverlay View Test\nOverlay View Test\nOverlay View Test"
+        android:textColor="@android:color/black"
+        android:textIsSelectable="true"
+        android:textSize="30dp" />
 </LinearLayout>

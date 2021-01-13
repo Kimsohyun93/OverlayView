@@ -2,27 +2,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/headerLL"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/closeBtn"
+            android:id="@+id/foldBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="close"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:text="Fold" />
 
         <TextView
             android:id="@+id/overlayHeader"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@android:color/white"
-            android:gravity="center"
+            android:gravity="center_vertical"
+            android:paddingLeft="40dp"
             android:text="Overlay View"
             android:textColor="@android:color/black"
             android:textSize="30sp" />
@@ -34,21 +36,27 @@
         android:id="@+id/overlayContents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/darker_gray"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background = "@color/colorPrimaryDark"
+            android:layout_height="match_parent"
+            android:text="Overlay View Test\nOverlay View Test\nOverlay View Test\nOverlay View Test\nOverlay View Test"
             android:textColor="@android:color/white"
-            android:textSize="30dp"
-            android:text="Overlay View Test\nOverlay View Test\nOverlay View Test\nOverlay View Test\nOverlay View Test" />
+            android:textIsSelectable="true"
+            android:textSize="30dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/transView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Open Second Activity"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:text="Open Second Activity" />
     </LinearLayout>
 </LinearLayout>
